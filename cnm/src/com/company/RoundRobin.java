@@ -175,6 +175,7 @@ class PCB implements Comparable<PCB> {
 
     static void newRun(PCB[] pcbs, int TimeQuantum,Queue<PCB> waitQueue) {
         Queue<PCB> readyQueue = new LinkedList<>();
+        float sum = 0;
 
         for (PCB pcb : pcbs) {
             waitQueue.offer(pcb);
@@ -184,9 +185,12 @@ class PCB implements Comparable<PCB> {
             System.out.println("Done.");
             for (PCB pcb : pcbs) {
                 System.out.println("当前进程:" + pcb.name + ",当前进程finishedTime:" + pcb.finishedTime);
+                sum += (float) pcb.finishedTime/ (float) pcb.requiredTime/ pcbs.length ;
             }
+            System.out.println("平均带权周转时间为:"+ sum);
         }
     }
+
 
     }
 
