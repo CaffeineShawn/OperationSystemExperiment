@@ -47,7 +47,6 @@ class PCB implements Comparable<PCB> {
     public int arriveTime;
     public int responseTime;
     public boolean moreSlice;
-    public boolean arrived;
     public int finishedTime = -1;
 
     @Override
