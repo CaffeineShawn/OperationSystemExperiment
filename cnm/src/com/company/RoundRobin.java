@@ -9,9 +9,7 @@ public class RoundRobin {
 
     static int currentTime = 0;
     static int timeSlice;
-    static int offset = 1;
     static Queue<PCB> waitQueue = new LinkedList<>();
-    static Queue<PCB> readyQueue = new LinkedList<>();
 
 
     public static void main(String[] args) {
@@ -51,7 +49,6 @@ class PCB implements Comparable<PCB> {
     public boolean moreSlice;
     public boolean arrived;
     public int finishedTime = -1;
-    static PCB tmp = null;
 
     @Override
     public int compareTo(PCB other) {
@@ -66,29 +63,15 @@ class PCB implements Comparable<PCB> {
         this.requiredTime = burstTime;
         this.arriveTime = arriveTime;
         this.moreSlice = true;
-        this.responseTime = 0;
-        if (arriveTime != 0) {
-            this.arrived = false;
-        } else {
-            this.arrived = true;
-        }
+
+
 
     }
-
-    static boolean hasArriveOrNot(PCB currentPCB) {
-        if (RoundRobin.currentTime >= currentPCB.arriveTime) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
 
 
     static boolean newExec(Queue<PCB> readyQueue, Queue<PCB> waitQueue, int TimeQuantum) {
         boolean newSlice = false;
-        PCB currentPCB = null;
+        PCB currentPCB;
         int timeSlice = TimeQuantum;
 
 
@@ -140,7 +123,6 @@ class PCB implements Comparable<PCB> {
 
                     }
                     newSlice = true;
-                    currentPCB = null;// 释放
                 }
 
                 else { // 就绪队列没有进程
