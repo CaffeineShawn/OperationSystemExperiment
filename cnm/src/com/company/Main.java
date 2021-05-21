@@ -1,7 +1,8 @@
 package com.company;
 
+import org.omg.CosNaming.BindingIterator;
 
-
+import java.io.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -37,17 +38,12 @@ public class Main {
 //            System.out.println(i.name);
             waitQueue.add(i);
         }
-
+        assert waitQueue.peek() != null;
+        currentTime = waitQueue.peek().arriveTime;
         PCB.run(readyQueue,waitQueue,null);
 
-        float res = 0;
 
-        for (PCB i : pcbs) {
-            System.out.println(i.name + "的周转时间为:" + i.turnAroundTime + ",服务时间为:" + i.requiredTime);
-            res += (float) i.turnAroundTime / (float) i.requiredTime / (float) pcbs.length;
-            System.out.printf(res + "\t");
-        }
-        System.out.println(res);
+
     }
 
 
@@ -57,131 +53,107 @@ public class Main {
 
 class PCB implements Comparable<PCB> {
     public String name;
-    public int requiredTimeRemaining;
+    public int requiredTime;
     public int arriveTime;
     public int responseTime;
     public boolean moreSlice;
     public boolean arrived;
-    public int turnAroundTime;
-    public int requiredTime;
     static PCB tmp = null;
-    static boolean newTimeSlice = false;
-
 
     @Override
     public int compareTo(PCB other) {
         return this.arriveTime - other.arriveTime;
     }
 
-    @Override
-    public String toString() {
-        return ("进程名:" + this.name +  "\n进程完成时间:" + this.turnAroundTime + "\n进程到达时间:" +  this.arriveTime);
+//    @Override
+//    public String toString() {
+//        return ("进程名:" + this.name +  "\n进程需求时间:" + this.requiredTime + "\n进程到达时间:" +  this.arriveTime);
+//
+//    }
 
-    }
-
-    PCB(String name, int requiredTimeRemaining, int arriveTime) {
+    PCB(String name, int requiredTime, int arriveTime) {
         this.name = name;
-        this.requiredTimeRemaining = requiredTimeRemaining;
+        this.requiredTime = requiredTime;
         this.arriveTime = arriveTime;
         this.moreSlice = true;
         this.responseTime = 0;
-        this.arrived = arriveTime == 0;
-        this.requiredTime = requiredTimeRemaining;
+        if (arriveTime != 0) {
+            this.arrived = false;
+        } else {
+            this.arrived = true;
+        }
 
     }
 
     static boolean hasArriveOrNot(PCB currentPCB) {
-        return Main.currentTime >= currentPCB.arriveTime;
+        if (Main.currentTime >= currentPCB.arriveTime) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
-    static boolean execute(Queue<PCB> readyQueue, Queue<PCB> waitQueue, PCB currentPCB) {
-        if(!waitQueue.isEmpty()){
-            if (hasArriveOrNot(waitQueue.peek()) == false && readyQueue.isEmpty()) {
-                Main.currentTime = waitQueue.peek().arriveTime;
-                Main.offset += Main.currentTime % Main.timeSlice;
-                Main.offset %= Main.timeSlice;
-                newTimeSlice = true;
-            }
+    static boolean execute(Queue<PCB> readyQueue,Queue<PCB> waitQueue,PCB currentPCB) {
+        boolean newTimeSlice = false;
+        if (Main.currentTime == 0) {
+            newTimeSlice = true;
         }
-
-
-        if (newTimeSlice || Main.currentTime == 0) {//新的时间片
-
-
-            if (!waitQueue.isEmpty()) {
+        if (newTimeSlice) {//新的时间片
+            newTimeSlice = false;
+            currentPCB = readyQueue.poll();
+            if (readyQueue.isEmpty() && !waitQueue.isEmpty()){
                 while (hasArriveOrNot(waitQueue.peek())) {
                     readyQueue.offer(waitQueue.poll());//补充就绪队列
                     if (waitQueue.isEmpty()) break;
                 }
             }
-
-            newTimeSlice = false;
-            currentPCB = readyQueue.poll();
             if (waitQueue.isEmpty() && readyQueue.isEmpty() && currentPCB == null) {
                 return false;
             }
 
         } else if (currentPCB == null) {
-           // System.out.println("finished");
-            return true;
+            System.out.println("finished");
         }
         //System.out.println(currentPCB.name);
-
+        currentPCB = readyQueue.poll();
 
         //execute
-        currentPCB.requiredTimeRemaining--;
-        if (currentPCB.requiredTimeRemaining <= 0) {
+        currentPCB.requiredTime--;
+        if (currentPCB.requiredTime == 0) {
             currentPCB.moreSlice = false;//提前完成
-            currentPCB.turnAroundTime = Main.currentTime +1;
             Main.offset += Main.currentTime % Main.timeSlice;
             Main.offset %= Main.timeSlice;
 
             newTimeSlice = true;
-        } else if ((Main.currentTime + Main.offset) % Main.timeSlice == 0) {
-            //正常进入新的时间片
-            System.out.println(currentPCB.name + "-Added to the readyQueue");
+        } else {
+
             readyQueue.offer(currentPCB);
-            newTimeSlice = true;
         }
-        System.out.printf("currentTime:%d\t%s\tremaining:%d\tnewTimeSlice:%b\n", Main.currentTime,currentPCB.name,currentPCB.requiredTimeRemaining,newTimeSlice);
-        for (PCB p : readyQueue) {
-            p.toString();
-        }
+        System.out.printf("%d:%s\n",Main.currentTime,currentPCB.name);
         Main.currentTime++;
-        System.out.println("currentTime:" +Main.currentTime);
-        if (!waitQueue.isEmpty()) {
-            while (hasArriveOrNot(waitQueue.peek())) {
-                System.out.println(waitQueue.peek().name +"-Added to the readyQueue");
-                readyQueue.offer(waitQueue.poll());//补充就绪队列
-                if (waitQueue.isEmpty()) break;
-            }
-        }
         //如果不切换时间片的话指向currentPCB的指针会丢失
 
-        if (!newTimeSlice) {
+        if (!newTimeSlice){
             tmp = currentPCB;
         }
         return true;
     }
 
-    static void run(Queue<PCB> readyQueue, Queue<PCB> waitQueue, PCB currentPCB) {
+    static void run(Queue<PCB> readyQueue,Queue<PCB> waitQueue,PCB currentPCB) {
 
         while (true) {
-            if (readyQueue.isEmpty() && Main.waitQueue.isEmpty() && currentPCB.requiredTimeRemaining != 0 ) {
+            if (readyQueue.isEmpty() && Main.waitQueue.isEmpty()) {
                 System.out.println("Finished:All process executed.");
                 break;
             } else {
                 currentPCB = tmp;
                 boolean flag = execute(readyQueue, waitQueue, currentPCB);
-                if (!flag) {
-                    System.out.println("Finished:All process executed.");
-                    return;
+                if (!flag) return;
                 }
             }
         }
     }
-}
 
 
 
