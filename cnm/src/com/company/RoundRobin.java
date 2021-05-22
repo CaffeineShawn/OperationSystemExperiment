@@ -8,12 +8,13 @@ import java.util.Scanner;
 public class RoundRobin {
 
     static int currentTime = 0;
-    static int timeSlice;
-    static Queue<PCB> waitQueue = new LinkedList<>();
 
 
     public static void main(String[] args) {
-	// write your code here
+        int timeSlice;
+        Queue<PCB> waitQueue = new LinkedList<>();
+
+
         Scanner sc = new Scanner(System.in);
 
         System.out.print("输入进程数:");
