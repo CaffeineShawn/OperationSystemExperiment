@@ -45,7 +45,6 @@ class PCB implements Comparable<PCB> {
     public int burstTime;
     public int requiredTime;
     public int arriveTime;
-    public boolean moreSlice;
     public int finishedTime = -1;
 
     @Override
@@ -60,7 +59,6 @@ class PCB implements Comparable<PCB> {
         this.burstTime = burstTime;
         this.requiredTime = burstTime;
         this.arriveTime = arriveTime;
-        this.moreSlice = true;
 
 
 
@@ -70,35 +68,35 @@ class PCB implements Comparable<PCB> {
     static boolean newExec(Queue<PCB> readyQueue, Queue<PCB> waitQueue, int TimeQuantum) {
         boolean newSlice = false;
         PCB currentPCB;
-        int timeSlice = TimeQuantum;
+        int localTimeQuantum = TimeQuantum;
 
 
         while (true){
             if (readyQueue.isEmpty() && waitQueue.isEmpty()) {
                 return true;
             }
-            boolean flag = checkIfArrived(readyQueue, waitQueue);
-            if ( !flag && readyQueue.isEmpty()) {
+            boolean newArrival = checkIfArrived(readyQueue, waitQueue);
+            if ( !newArrival && readyQueue.isEmpty()) {
                 RoundRobin.currentTime++;    // 处理机idle}
-            } else if (flag) {
+            } else if (newArrival) {
                 newSlice = true;
             }
 
 
 
             while (newSlice) {
-                TimeQuantum = timeSlice;
+                localTimeQuantum = TimeQuantum;
                 if (!readyQueue.isEmpty()) { // 就绪队列有进程
                     currentPCB = readyQueue.poll();
-                    int difference = currentPCB.burstTime - TimeQuantum;
+                    int difference = currentPCB.burstTime - localTimeQuantum;
                     if (difference <= 0) {
                         while (currentPCB.burstTime > 0) {
-                            TimeQuantum--;
+                            localTimeQuantum--;
                             currentPCB.burstTime--;
                             if (currentPCB.burstTime == 0) {
                                 currentPCB.finishedTime = RoundRobin.currentTime +1;
                             }
-                            log(currentPCB, TimeQuantum);
+                            log(currentPCB, localTimeQuantum);
 
                             RoundRobin.currentTime++;
                             if (!waitQueue.isEmpty()) {
@@ -107,10 +105,10 @@ class PCB implements Comparable<PCB> {
                         }
 
                     } else {
-                        while (TimeQuantum > 0) {
-                            TimeQuantum--;
+                        while (localTimeQuantum > 0) {
+                            localTimeQuantum--;
                             currentPCB.burstTime--;
-                            log(currentPCB, TimeQuantum);
+                            log(currentPCB, localTimeQuantum);
 
                             RoundRobin.currentTime++;
                             if (!waitQueue.isEmpty()) {
@@ -133,19 +131,18 @@ class PCB implements Comparable<PCB> {
     }
 
     static boolean checkIfArrived(Queue<PCB> readyQueue, Queue<PCB> waitQueue) {
-        boolean flag = false;
-        if (waitQueue.isEmpty()) {
-            return false;
-        } else {
+        boolean newArrival = false;
+        if (!waitQueue.isEmpty()) {
+
             while (waitQueue.peek().arriveTime <= RoundRobin.currentTime){
                 readyQueue.offer(waitQueue.poll());
-                flag = true;
+                newArrival = true;
                 if (waitQueue.isEmpty()) {
                     break;
                 }
             }
         }
-        return flag;
+        return newArrival;
     }
 
     static void log(PCB currentPCB, int TimeQuantum) {
