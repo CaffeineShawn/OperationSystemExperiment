@@ -12,9 +12,6 @@ public class RoundRobin {
 
     public static void main(String[] args) {
         int timeSlice;
-        Queue<PCB> waitQueue = new LinkedList<>();
-
-
         Scanner sc = new Scanner(System.in);
 
         System.out.print("输入进程数:");
@@ -24,14 +21,14 @@ public class RoundRobin {
         System.out.print("输入时间片长:");
         timeSlice = sc.nextInt();
 
-        PCB[] pcbs = new PCB[sizeofPCB];
+        PCB[] pcbArray = new PCB[sizeofPCB];
         for (int i = 0; i < sizeofPCB; i++) {
             System.out.print("输入当前进程名、需求执行时间、到达时间:");
-            pcbs[i] = new PCB(sc.next(), sc.nextInt(), sc.nextInt());
+            pcbArray[i] = new PCB(sc.next(), sc.nextInt(), sc.nextInt());
         }
-        Arrays.sort(pcbs);
+        Arrays.sort(pcbArray);
 
-        PCB.newRun(pcbs,timeSlice,waitQueue);
+        PCB.processEntry(pcbArray,timeSlice);
 
 
     }
@@ -66,10 +63,10 @@ class PCB implements Comparable<PCB> {
     }
 
 
-    static boolean newExec(Queue<PCB> readyQueue, Queue<PCB> waitQueue, int TimeQuantum) {
+    static boolean processExecute(Queue<PCB> readyQueue, Queue<PCB> waitQueue, int TimeQuantum) {
         boolean newSlice = false;
         PCB currentPCB;
-        int localTimeQuantum = TimeQuantum;
+        int localTimeQuantum;
 
 
         while (true){
@@ -151,19 +148,20 @@ class PCB implements Comparable<PCB> {
     }
 
 
-    static void newRun(PCB[] pcbs, int TimeQuantum,Queue<PCB> waitQueue) {
+    static void processEntry(PCB[] pcbArray, int TimeQuantum) {
         Queue<PCB> readyQueue = new LinkedList<>();
+        Queue<PCB> waitQueue = new LinkedList<>();
         float sum = 0;
 
-        for (PCB pcb : pcbs) {
+        for (PCB pcb : pcbArray) {
             waitQueue.offer(pcb);
         }
 
-        if (newExec(readyQueue, waitQueue, TimeQuantum)) {
+        if (processExecute(readyQueue, waitQueue, TimeQuantum)) {
             System.out.println("Done.");
-            for (PCB pcb : pcbs) {
+            for (PCB pcb : pcbArray) {
                 System.out.println("当前进程:" + pcb.name + ",当前进程finishedTime:" + pcb.finishedTime);
-                sum += (float) pcb.finishedTime/ (float) pcb.requiredTime/ pcbs.length ;
+                sum += (float) pcb.finishedTime/ (float) pcb.requiredTime/ pcbArray.length ;
             }
             System.out.println("平均带权周转时间为:"+ sum);
         }
