@@ -33,7 +33,7 @@ public class RoundRobin {
             }
 
         } else {
-            pcbArray = PCBReader.readTXT("src/com/company/1.txt");
+            pcbArray = PCBReader.readTXT("src/com/company/testExample.txt");
         }
         Arrays.sort(pcbArray);
 
