@@ -37,7 +37,7 @@ public class PCBReader {
 					int burstTime = Integer.parseInt(pcbData[1]);
 					int arriveTime = Integer.parseInt(pcbData[2]);
 					pcbs[i] = new PCB(name, burstTime, arriveTime);
-					System.out.println(pcbs[i].name + " " + pcbs[i].burstTime + " " + pcbs[i].arriveTime);
+					System.out.println(pcbs[i].name + " " + pcbs[i].burstTime + " " + pcbs[i].arriveTime +"\n");
 				}
 				bufferedReader.close();
 			} else {

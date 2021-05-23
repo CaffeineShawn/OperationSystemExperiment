@@ -1,5 +1,7 @@
 package com.company;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -11,26 +13,41 @@ public class RoundRobin {
     static int timeSlice = 0;
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         PCB[] pcbArray;
         Scanner sc = new Scanner(System.in);
 
-        System.out.printf("Input 'Manual' to input manually or use txt input:");
+        System.out.print("Input 'Manual' to input manually or use txt input:");
         String modeSelection = sc.next();
 
-        if (modeSelection == "Manual") {
+        if (modeSelection.equals("Manual")) {
+            File savedTestcase = new File("src/com/company/savedTestcase.txt");
+
+            FileOutputStream outputStream = new FileOutputStream(savedTestcase, true);
+
+
+
+
             System.out.print("输入进程数:");
             int sizeofPCB = sc.nextInt();
+
 
 
             System.out.print("输入时间片长:");
             timeSlice = sc.nextInt();
 
+            String basicData = sizeofPCB + "\n" + timeSlice + "\n";
+            outputStream.write(basicData.getBytes(StandardCharsets.UTF_8));
+
+
             pcbArray = new PCB[sizeofPCB];
             for (int i = 0; i < sizeofPCB; i++) {
                 System.out.print("输入当前进程名、需求执行时间、到达时间:");
                 pcbArray[i] = new PCB(sc.next(), sc.nextInt(), sc.nextInt());
+                String pcbData = pcbArray[i].name + " " + pcbArray[i].burstTime + " " + pcbArray[i].requiredTime + "\n";
+                outputStream.write(pcbData.getBytes(StandardCharsets.UTF_8));
             }
+            outputStream.close();
 
         } else {
             pcbArray = PCBReader.readTXT("src/com/company/TestExample.txt");
@@ -40,7 +57,7 @@ public class RoundRobin {
         PCB.processEntry(pcbArray,timeSlice);
 
 
-    }
+    } 
 
 
 
