@@ -18,15 +18,12 @@ public class RoundRobin {
         Scanner sc = new Scanner(System.in);
 
         System.out.print("Input 'Manual' to input manually or use txt input:");
-        String modeSelection = sc.next();
+        String modeSelection = sc.nextLine();
 
         if (modeSelection.equals("Manual")) {
             File savedTestcase = new File("src/com/company/savedTestcase.txt");
 
             FileOutputStream outputStream = new FileOutputStream(savedTestcase, true);
-
-
-
 
             System.out.print("输入进程数:");
             int sizeofPCB = sc.nextInt();
@@ -47,6 +44,8 @@ public class RoundRobin {
                 String pcbData = pcbArray[i].name + " " + pcbArray[i].burstTime + " " + pcbArray[i].requiredTime + "\n";
                 outputStream.write(pcbData.getBytes(StandardCharsets.UTF_8));
             }
+            String enter = "\n";
+            outputStream.write(enter.getBytes(StandardCharsets.UTF_8));
             outputStream.close();
 
         } else {
@@ -57,7 +56,7 @@ public class RoundRobin {
         PCB.processEntry(pcbArray,timeSlice);
 
 
-    } 
+    }
 
 
 
