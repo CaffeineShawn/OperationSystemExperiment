@@ -8,23 +8,32 @@ import java.util.Scanner;
 public class RoundRobin {
 
     static int currentTime = 0;
+    static int timeSlice = 0;
 
 
     public static void main(String[] args) {
-        int timeSlice;
+        PCB[] pcbArray;
         Scanner sc = new Scanner(System.in);
 
-        System.out.print("输入进程数:");
-        int sizeofPCB = sc.nextInt();
+        System.out.println("Manual or Auto(read from txt)?");
+        String modeSelection = sc.next();
+
+        if (modeSelection == "Manual") {
+            System.out.print("输入进程数:");
+            int sizeofPCB = sc.nextInt();
 
 
-        System.out.print("输入时间片长:");
-        timeSlice = sc.nextInt();
+            System.out.print("输入时间片长:");
+            timeSlice = sc.nextInt();
 
-        PCB[] pcbArray = new PCB[sizeofPCB];
-        for (int i = 0; i < sizeofPCB; i++) {
-            System.out.print("输入当前进程名、需求执行时间、到达时间:");
-            pcbArray[i] = new PCB(sc.next(), sc.nextInt(), sc.nextInt());
+            pcbArray = new PCB[sizeofPCB];
+            for (int i = 0; i < sizeofPCB; i++) {
+                System.out.print("输入当前进程名、需求执行时间、到达时间:");
+                pcbArray[i] = new PCB(sc.next(), sc.nextInt(), sc.nextInt());
+            }
+
+        } else {
+            pcbArray = PCBReader.readTXT("src/com/company/1.txt");
         }
         Arrays.sort(pcbArray);
 
@@ -57,9 +66,6 @@ class PCB implements Comparable<PCB> {
         this.burstTime = burstTime;
         this.requiredTime = burstTime;
         this.arriveTime = arriveTime;
-
-
-
     }
 
 
