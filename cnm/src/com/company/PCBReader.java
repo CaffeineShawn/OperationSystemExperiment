@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 
 public class PCBReader {
 	public static void main(String[] args) {
-		String filePath = "src/com/company/testExample.txt";
+		String filePath = "src/com/company/TestExample.txt";
 		readTXT(filePath);
 	}
 
