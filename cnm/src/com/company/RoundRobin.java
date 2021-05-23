@@ -15,7 +15,7 @@ public class RoundRobin {
         PCB[] pcbArray;
         Scanner sc = new Scanner(System.in);
 
-        System.out.println("Manual or Auto(read from txt)?");
+        System.out.printf("Input 'Manual' to input manually or use txt input:");
         String modeSelection = sc.next();
 
         if (modeSelection == "Manual") {
