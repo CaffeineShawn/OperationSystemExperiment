@@ -1,77 +1,80 @@
 package com.company;
 
+import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Scanner;
 
 public class Partition {
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
-        System.out.print("请输入分区数:");
-        Partition[] partitions = new Partition[sc.nextInt()];
 
         System.out.print("请输入分区的起始地址:");
         int startAddress = sc.nextInt();
+        ;
+        LinkedList<Partition> partitionLinkedlist = new LinkedList<>();
+        LinkedList<Process> processes = new LinkedList<>();
 
+        System.out.print("请输入分区的大小:");
+        partitionLinkedlist.add(new Partition(sc.nextInt(),startAddress));
 
-        for (int i = 0; i < partitions.length; i++) {
-            System.out.print("请输入分区" + i + "的大小:");
-            partitions[i] = new Partition(sc.nextInt(),i);
-            if (i == 0) {
-                partitions[i].address = startAddress;
-            } else {
-                partitions[i].address = partitions[i].partitionSize + partitions[i - 1].address;
-                partitions[i - 1].nextPartition = partitions[i];
+        for (Partition partition : partitionLinkedlist) {
+            System.out.println(partition.toString());
+        }
+
+        int processId = 1;
+
+        boolean looping = true;
+        while (looping){
+            System.out.print("1 for alloc, 2 for release, 3 for exit:");
+            int selection = sc.nextInt();
+            switch (selection) {
+                case 1: {
+                    System.out.print("请输入作业"+ processId + "需要的空间大小:");
+                    Process newProcess = new Process(sc.nextInt(), processId++);
+                    processes.add(newProcess);
+                    Process.firstFitPartition(partitionLinkedlist, newProcess);
+
+                    break;
+                }
+                case 2: {
+                    System.out.print("需要释放的作业号为:");
+                    Process.releasePartition(partitionLinkedlist, processes.get(sc.nextInt()));
+                    break;
+                }
+                case 3: {
+                    looping = false;
+                    break;
+                }
+            }
+            for (Partition partition : partitionLinkedlist) {
+                System.out.println(partition.toString());
             }
         }
 
-        System.out.print("请输入进程数:");
-        Process[] processes = new Process[sc.nextInt()];
-
-        for (int i = 0; i < processes.length; i++) {
-            System.out.print("请输入进程"+ i + "需要的空间大小:");
-            processes[i] = new Process(sc.nextInt(),i);
-        }
-
-        Process.firstFitPartition(partitions, processes);
-
-        for (int i = 0; i < processes.length; i++) {
-            System.out.println(processes[i].toString());
-        }
-
-        for (Partition partition : partitions) {
-            System.out.println(partition.toString());
-        }
-        System.out.print("需要释放的进程号为:");
-        Process.releasePartition(partitions,processes[sc.nextInt()]);
     }
 
     int partitionSize;
-    int availableSpace;
-    int address;
-    int id;
-    Partition nextPartition;
+    int startAddress;
+    int processId = -1;
+    boolean assigned = false;
 
 
 
-
-    Partition(int partitionSize, int id) {
+    Partition(int partitionSize,int startAddress) {
+        this.startAddress = startAddress;
         this.partitionSize = partitionSize;
-        this.availableSpace = partitionSize;
-        this.id = id;
-        nextPartition = null;
     }
 
     @Override
     public String toString() {
 
-        return  "当前分区号:" +
-                this.id +
-                ",当前分区起始地址:" +
-                this.address +
-                ",当前分区大小:" +
-                this.partitionSize +
-                ",当前分区空闲空间:" +
-                this.availableSpace;
+        String res =
+                "当前分区起始地址:" + this.startAddress + ",当前分区大小:" + this.partitionSize + ",当前分区分配情况:" + this.assigned;
+        if (this.assigned == true) {
+            res = res + ",当前分区作业号:" + this.processId;
+        }
+        return res;
     }
 
 
@@ -93,48 +96,51 @@ class Process {
         this.requiredSpace = requiredSpace;
     }
 
-    static void firstFitPartition(Partition[] partitions, Process[] processes) {
+    static void firstFitPartition(LinkedList<Partition> partitionLinkedList, Process process) {
         int partitionIndex;
         int processIndex;
         processIndex = 0;
 
-        while (processIndex != processes.length) {
-            boolean assignSuccess = false;
-            System.out.println("Current process:" + processIndex);
-            for (partitionIndex = 0; partitionIndex != partitions.length; partitionIndex++) {
-                System.out.println("Current partition:" + partitionIndex);
-                if (partitions[partitionIndex].availableSpace >= processes[processIndex].requiredSpace) {
-                    partitions[partitionIndex].availableSpace -= processes[processIndex].requiredSpace;
-                    processes[processIndex].assignedPartition = partitionIndex;
-                    processIndex++;
-                    assignSuccess = true;
-                    break;
 
-                }
-            }
-            if (!assignSuccess) {
-                System.out.println("Could not assign Process:" + processIndex + ", skipping...");
-                processIndex++;
+
+
+
+        boolean assignSuccess = false;
+        System.out.println("Current process:" + processIndex);
+
+
+        for (Partition currentPartition : partitionLinkedList) {
+            if (currentPartition.partitionSize >= process.requiredSpace && currentPartition.assigned == false) {
+
+                int currentId = partitionLinkedList.lastIndexOf(currentPartition);
+                Partition newPartition = new Partition(currentPartition.partitionSize - process.requiredSpace, currentPartition.startAddress + process.requiredSpace);
+                currentPartition.partitionSize = process.requiredSpace;
+                currentPartition.assigned = true;
+                currentPartition.processId = process.id;
+                assignSuccess = true;
+                partitionLinkedList.add(currentId +1,newPartition);
+
+
+                break;
+
             }
         }
-    }
+        if (!assignSuccess) {
+            System.out.println("Could not assign Process:" + processIndex + ", skipping...");
+            processIndex++;
+        }
 
-    @Override
-    public String toString() {
-        return "进程" + this.id + ":当前占用的空间大小为:" + this.requiredSpace + ",当前分配的分区号为:" + this.assignedPartition;
     }
-
-    static void releasePartition(Partition[] partitions, Process process) {
+    
+    static void releasePartition(LinkedList<Partition> partitionLinkedList, Process process) {
         Scanner sc = new Scanner(System.in);
         System.out.print(process.toString() + ",需要释放的空间大小为:");
-        int releaseSpace = sc.nextInt();
-        partitions[process.assignedPartition].availableSpace += releaseSpace;
-        if (releaseSpace == process.requiredSpace) {
-            process.assignedPartition = -1;
-        }
+        for (Partition currentPartititon : partitionLinkedList) {
+            if (currentPartititon.processId == process.id) {
+                currentPartititon.processId = -1;
+                currentPartititon.assigned = false;
 
-        for (Partition partition : partitions) {
-            System.out.println(partition.toString());
+            }
         }
 
     }
