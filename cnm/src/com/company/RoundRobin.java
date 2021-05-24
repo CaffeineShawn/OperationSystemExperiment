@@ -183,11 +183,18 @@ class PCB implements Comparable<PCB> {
 
         if (newExec(readyQueue, waitQueue, TimeQuantum)) {
             System.out.println("Done.");
+<<<<<<< Updated upstream
             for (PCB pcb : pcbs) {
                 System.out.println("当前进程:" + pcb.name + ",当前进程finishedTime:" + pcb.finishedTime);
                 sum += (float) pcb.finishedTime/ (float) pcb.requiredTime/ pcbs.length ;
+=======
+            for (PCB pcb : pcbArray) {
+                float wtTime = (float) pcb.finishedTime / (float) pcb.requiredTime;
+                System.out.println("当前进程:" + pcb.name + ",当前进程finishedTime:" + pcb.finishedTime +",当前进程带权周转时间:" + wtTime);
+                sum += wtTime / pcbArray.length;
+>>>>>>> Stashed changes
             }
-            System.out.println("平均带权周转时间为:"+ sum);
+            System.out.printf("平均带权周转时间为:%.2f\n", sum);
         }
     }
 
