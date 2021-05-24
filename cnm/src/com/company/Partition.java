@@ -131,14 +131,27 @@ class Process {
         }
 
     }
-    
+
     static void releasePartition(LinkedList<Partition> partitionLinkedList, Process process) {
         Scanner sc = new Scanner(System.in);
         System.out.print(process.toString() + ",需要释放的空间大小为:");
+        int releaseSize = sc.nextInt();
         for (Partition currentPartititon : partitionLinkedList) {
             if (currentPartititon.processId == process.id) {
-                currentPartititon.processId = -1;
-                currentPartititon.assigned = false;
+                if (currentPartititon.partitionSize == releaseSize) {
+                    currentPartititon.processId = -1;
+                    currentPartititon.assigned = false;
+                } else if (releaseSize < currentPartititon.partitionSize) {
+                    int currentId = partitionLinkedList.lastIndexOf(currentPartition);
+                    Partition newPartition = new Partition(currentPartition.partitionSize - process.requiredSpace, currentPartition.startAddress + process.requiredSpace);
+                    currentPartition.partitionSize = process.requiredSpace;
+                    currentPartition.assigned = true;
+                    currentPartition.processId = process.id;
+                    assignSuccess = true;
+                    partitionLinkedList.add(currentId +1,newPartition);
+                } else {
+                    System.out.println("ERROR: Illegal release size.");
+                }
 
             }
         }
