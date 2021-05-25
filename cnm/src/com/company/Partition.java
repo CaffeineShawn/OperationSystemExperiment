@@ -8,6 +8,12 @@ public class Partition implements Comparable<Partition> {
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
+        int algorithmSelection = 0;
+        while (algorithmSelection != 1  && algorithmSelection != 2) {
+            System.out.print("1 for first-fit and 2 for best-fit:");
+            algorithmSelection = sc.nextInt();
+        }
+        System.out.println("You have chosen:" + (algorithmSelection - 1 == 0 ? "first-fit" : "best-fit") );
 
         System.out.print("请输入分区的起始地址:");
         int startAddress = sc.nextInt();
@@ -15,32 +21,36 @@ public class Partition implements Comparable<Partition> {
         LinkedList<Process> processes = new LinkedList<>();
 
         System.out.print("请输入分区的大小:");
-        partitionLinkedList.add(new Partition(sc.nextInt(),startAddress));
+        partitionLinkedList.add(new Partition(sc.nextInt(), startAddress));
 
         for (Partition partition : partitionLinkedList) {
             System.out.println(partition.toString());
         }
 
 
-
         int processId = 1;
 
         boolean looping = true;
-        while (looping){
+        while (looping) {
             System.out.print("1 for alloc, 2 for release, 3 for exit:");
             int selection = sc.nextInt();
             switch (selection) {
                 case 1: {
-                    System.out.print("请输入作业"+ processId + "需要的空间大小:");
+                    System.out.print("请输入作业" + processId + "需要的空间大小:");
                     Process newProcess = new Process(sc.nextInt(), processId++);
                     processes.add(newProcess);
-                    Process.firstFitPartition(partitionLinkedList, newProcess);
+                    if (algorithmSelection == 1) {
+                        FirstFitPartition(partitionLinkedList, newProcess);
+                    } else {
+                        BestFitPartition(partitionLinkedList,newProcess);
+                    }
+
 
                     break;
                 }
                 case 2: {
                     System.out.print("需要释放的作业号为:");
-                    Process.releasePartition(partitionLinkedList, processes.get(sc.nextInt()-1));
+                    releasePartition(partitionLinkedList, processes.get(sc.nextInt() - 1));
                     break;
                 }
                 case 3: {
@@ -63,8 +73,7 @@ public class Partition implements Comparable<Partition> {
     boolean assigned = false;
 
 
-
-    Partition(int partitionSize,int startAddress) {
+    Partition(int partitionSize, int startAddress) {
         this.startAddress = startAddress;
         this.partitionSize = partitionSize;
     }
@@ -80,7 +89,10 @@ public class Partition implements Comparable<Partition> {
         return res;
     }
 
-
+    @Override
+    public int compareTo(Partition o) {
+        return -this.partitionSize + o.partitionSize;
+    }
 
 
     static void MergeFreePartition(LinkedList<Partition> partitionLinkedList) {
@@ -103,26 +115,7 @@ public class Partition implements Comparable<Partition> {
         }
     }
 
-
-    @Override
-    public int compareTo(Partition o) {
-        return this.partitionSize - o.partitionSize;
-    }
-}
-
-
-
-class Process {
-    int requiredSpace;
-    int id;
-
-
-    Process(int requiredSpace, int id) {
-        this.id = id;
-        this.requiredSpace = requiredSpace;
-    }
-
-    static void firstFitPartition(LinkedList<Partition> partitionLinkedList, Process process) {
+    static void FirstFitPartition(LinkedList<Partition> partitionLinkedList, Process process) {
 
         boolean assignSuccess = false;
 
@@ -136,7 +129,7 @@ class Process {
                 currentPartition.assigned = true;
                 currentPartition.processId = process.id;
                 assignSuccess = true;
-                partitionLinkedList.add(currentId +1,newPartition);
+                partitionLinkedList.add(currentId + 1, newPartition);
 
 
                 break;
@@ -146,6 +139,43 @@ class Process {
         if (!assignSuccess) {
             System.out.println("Could not assign 作业" + process.id + ", skipping...");
 
+        }
+
+    }
+
+    static void BestFitPartition(LinkedList<Partition> partitionLinkedList, Process process) {
+        Partition bestFitPartition = null;
+        int bestFitIndex = -1;
+        //partitionLinkedList.sort(Partition::compareTo);
+        // Search for the best-fit partition.
+        for (Partition currentPartition : partitionLinkedList) {
+            //if ((currentPartition.partitionSize - process.requiredSpace <= bestFitPartition.partitionSize - process.requiredSpace) && !currentPartition.assigned) {
+            if (!currentPartition.assigned){
+                if (bestFitPartition == null) {
+                    if (process.requiredSpace <= currentPartition.partitionSize) {
+                        bestFitPartition = currentPartition;
+                        bestFitIndex = partitionLinkedList.indexOf(currentPartition);
+                    }
+                } else if ((currentPartition.partitionSize - process.requiredSpace <= bestFitPartition.partitionSize - process.requiredSpace)) {
+                    bestFitPartition = currentPartition;
+                    bestFitIndex = partitionLinkedList.indexOf(currentPartition);
+                }
+            }
+
+
+
+        }
+
+
+        if (bestFitPartition == null) {
+            System.out.println("Could not assign 作业" + process.id + ", skipping...");
+        } else {
+            Partition newPartition = new Partition(bestFitPartition.partitionSize - process.requiredSpace, bestFitPartition.startAddress + process.requiredSpace);
+            bestFitPartition.partitionSize = process.requiredSpace;
+            bestFitPartition.assigned = true;
+            bestFitPartition.processId = process.id;
+
+            partitionLinkedList.add(bestFitIndex + 1, newPartition);
         }
 
     }
@@ -169,7 +199,7 @@ class Process {
                     newPartition.processId = process.id;
                     newPartition.assigned = true;
                     //releaseSuccess = true;
-                    partitionLinkedList.add(currentId +1,newPartition);
+                    partitionLinkedList.add(currentId + 1, newPartition);
 
                     break;
                 } else {
@@ -180,6 +210,23 @@ class Process {
         }
 
     }
+
+
+}
+
+
+
+class Process {
+    int requiredSpace;
+    int id;
+
+
+    Process(int requiredSpace, int id) {
+        this.id = id;
+        this.requiredSpace = requiredSpace;
+    }
+
+
 
     
 
