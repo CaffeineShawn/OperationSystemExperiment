@@ -10,7 +10,7 @@ public class PCBReader {
 	}
 
 	public static PCB[] readTXT(String filePath) {
-		PCB[] pcbs = null;
+		PCB[] pcbArray = null;
 
 		try {
 			File file = new File(filePath);
@@ -20,7 +20,7 @@ public class PCBReader {
 
 				int sizeOfPcbArray = Integer.parseInt(bufferedReader.readLine());
 				System.out.println("共有" + sizeOfPcbArray + "个进程");
-				pcbs = new PCB[sizeOfPcbArray];
+				pcbArray = new PCB[sizeOfPcbArray];
 
 				String sizeOfTimeSlice = bufferedReader.readLine();
 				System.out.println("时间片长度为" + sizeOfTimeSlice);
@@ -32,8 +32,8 @@ public class PCBReader {
 					String name = pcbData[0];
 					int burstTime = Integer.parseInt(pcbData[1]);
 					int arriveTime = Integer.parseInt(pcbData[2]);
-					pcbs[i] = new PCB(name, burstTime, arriveTime);
-					System.out.println(pcbs[i].name + " " + pcbs[i].burstTime + " " + pcbs[i].arriveTime +"\n");
+					pcbArray[i] = new PCB(name, burstTime, arriveTime);
+					System.out.println(pcbArray[i].name + " " + pcbArray[i].burstTime + " " + pcbArray[i].arriveTime +"\n");
 				}
 				bufferedReader.close();
 			} else {
@@ -42,6 +42,6 @@ public class PCBReader {
 		} catch (IOException e) {
 			System.out.println("File read error.");
 		}
-		return pcbs;
+		return pcbArray;
 	}
 }
