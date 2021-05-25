@@ -39,7 +39,7 @@ public class Partition {
                 }
                 case 2: {
                     System.out.print("需要释放的作业号为:");
-                    Process.releasePartition(partitionLinkedlist, processes.get(sc.nextInt()));
+                    Process.releasePartition(partitionLinkedlist, processes.get(sc.nextInt()-1));
                     break;
                 }
                 case 3: {
@@ -70,7 +70,7 @@ public class Partition {
     public String toString() {
 
         String res =
-                "当前分区起始地址:" + this.startAddress + ",当前分区大小:" + this.partitionSize + ",当前分区分配情况:" + this.assigned;
+                "当前分区起始地址:" + this.startAddress + ",当前分区大小:" + this.partitionSize + ",当前分区分配情况:" + (this.assigned ? "assigned" : "free");
         if (this.assigned == true) {
             res = res + ",当前分区作业号:" + this.processId;
         }
@@ -101,12 +101,7 @@ class Process {
         int processIndex;
         processIndex = 0;
 
-
-
-
-
         boolean assignSuccess = false;
-        System.out.println("Current process:" + processIndex);
 
 
         for (Partition currentPartition : partitionLinkedList) {
@@ -134,21 +129,35 @@ class Process {
 
     static void releasePartition(LinkedList<Partition> partitionLinkedList, Process process) {
         Scanner sc = new Scanner(System.in);
-        System.out.print(process.toString() + ",需要释放的空间大小为:");
-        int releaseSize = sc.nextInt();
-        for (Partition currentPartititon : partitionLinkedList) {
-            if (currentPartititon.processId == process.id) {
-                if (currentPartititon.partitionSize == releaseSize) {
-                    currentPartititon.processId = -1;
-                    currentPartititon.assigned = false;
-                } else if (releaseSize < currentPartititon.partitionSize) {
+        //System.out.print(process.toString() + ",需要释放的空间大小为:");
+      //  int releaseSize = sc.nextInt();
+        boolean releaseSuccess = false;
+        for (Partition currentPartition : partitionLinkedList) {
+
+            if (currentPartition.processId == process.id) {
+                System.out.print(currentPartition.toString()  + ",需要释放的空间大小为:");
+                int releaseSpace = sc.nextInt();
+                if (currentPartition.partitionSize == releaseSpace) {
+                    currentPartition.processId = -1;
+                    currentPartition.assigned = false;
+                } else if (releaseSpace < currentPartition.partitionSize) {
                     int currentId = partitionLinkedList.lastIndexOf(currentPartition);
-                    Partition newPartition = new Partition(currentPartition.partitionSize - process.requiredSpace, currentPartition.startAddress + process.requiredSpace);
-                    currentPartition.partitionSize = process.requiredSpace;
-                    currentPartition.assigned = true;
-                    currentPartition.processId = process.id;
-                    assignSuccess = true;
+                    Partition newPartition = new Partition(currentPartition.partitionSize - releaseSpace, currentPartition.startAddress + releaseSpace);
+                    currentPartition.partitionSize = releaseSpace;
+                    currentPartition.assigned = false;
+                    currentPartition.processId = -1;
+                    newPartition.processId = process.id;
+                    newPartition.assigned = true;
+                    //releaseSuccess = true;
                     partitionLinkedList.add(currentId +1,newPartition);
+                    if (currentId > 1) {
+                        if (partitionLinkedList.get(currentId - 1).assigned == false) {
+                            Partition formerPartition = partitionLinkedList.get(currentId - 1);
+                            formerPartition.partitionSize += currentPartition.partitionSize;
+                            partitionLinkedList.remove(currentId);
+                        }
+                    }
+                    break;
                 } else {
                     System.out.println("ERROR: Illegal release size.");
                 }

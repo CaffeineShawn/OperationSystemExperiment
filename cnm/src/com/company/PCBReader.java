@@ -18,10 +18,6 @@ public class PCBReader {
 				InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
 				BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
-//				String lineTxt;
-//				while ((lineTxt = bufferedReader.readLine()) != null) {
-//					System.out.println(lineTxt);
-//				}
 				int sizeOfPcbArray = Integer.parseInt(bufferedReader.readLine());
 				System.out.println("共有" + sizeOfPcbArray + "个进程");
 				pcbs = new PCB[sizeOfPcbArray];
