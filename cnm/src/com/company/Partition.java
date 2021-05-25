@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Scanner;
 
-public class Partition {
+public class Partition implements Comparable<Partition> {
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
@@ -20,6 +20,8 @@ public class Partition {
         for (Partition partition : partitionLinkedList) {
             System.out.println(partition.toString());
         }
+
+
 
         int processId = 1;
 
@@ -47,6 +49,7 @@ public class Partition {
                 }
             }
             MergeFreePartition(partitionLinkedList);
+            MergeFreePartition(partitionLinkedList);// in case of merging the latter one :)
             for (Partition partition : partitionLinkedList) {
                 System.out.println(partition.toString());
             }
@@ -78,6 +81,8 @@ public class Partition {
     }
 
 
+
+
     static void MergeFreePartition(LinkedList<Partition> partitionLinkedList) {
         Partition formerPart;
         ListIterator<Partition> listIterator = partitionLinkedList.listIterator();
@@ -99,6 +104,10 @@ public class Partition {
     }
 
 
+    @Override
+    public int compareTo(Partition o) {
+        return this.partitionSize - o.partitionSize;
+    }
 }
 
 
