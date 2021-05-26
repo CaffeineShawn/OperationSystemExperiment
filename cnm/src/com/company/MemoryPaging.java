@@ -42,7 +42,7 @@ public class MemoryPaging {
         return true;
     }
 
-    static void instructionExecute(boolean[] instructionsArray, int index) {
+    static int instructionExecute(boolean[] instructionsArray, int index) {
         int pageIndex = index / 10;
         System.out.println("Currently executing: " + index + " at Page " + pageIndex);
 
@@ -51,6 +51,7 @@ public class MemoryPaging {
         } else {
             System.out.println((index) + " has already been executed.");
         }
+        return pageIndex;
     }
 
 }
