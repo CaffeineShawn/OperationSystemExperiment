@@ -183,8 +183,8 @@ public class MemoryPaging {
         for (Integer integer : pageInMemory) {
             System.out.printf("%d ", integer);
         }
-        System.out.print("\n");
-        System.out.print("LRU notRecentlyUsed: ");
+
+        System.out.print(", notRecentlyUsed: ");
         for (Integer integer : notRecentlyUsed) {
             System.out.printf("%d ", integer);
         }
@@ -201,12 +201,20 @@ public class MemoryPaging {
                         lessOppotunity = i;
                     }
                 }
+                System.out.println("OPT swap in " + pageIndex);
+                System.out.println("OPT swap out " + lessOppotunity);
                 pageInMemory.removeFirstOccurrence(lessOppotunity);
                 pageInMemory.offer(pageIndex);
+
             } else {
                 pageInMemory.offer(pageIndex);
             }
         }
+        System.out.print("OPT Page in memory: ");
+        for (Integer integer : pageInMemory) {
+            System.out.printf("%d ", integer);
+        }
+        System.out.print("\n");
 
     }
 
