@@ -78,7 +78,7 @@ public class MemoryPaging {
 
 
         for (int i = 1; i < 321; i++) {
-            instructionExecute(instructionsArray[i],map);
+            instructionExecute(instructionsArray[i],map,instructionsArray,i);
         }
 
 
@@ -96,15 +96,15 @@ public class MemoryPaging {
 
     }
 
-    static void instructionExecute(int index,Map<Integer,Integer> map) {
-        int pageIndex = index / 10;
+    static void instructionExecute(int value,Map<Integer,Integer> map,int[] array,int index) {
+        int pageIndex = value / 10;
 
 
-        System.out.println("------Currently executing: " + index + " at Page " + pageIndex);
+        System.out.println("------Currently executing instruction: " + index + " at Page " + pageIndex);
         FIFO(pageIndex, pageInMemoryFIFO);
         LRU(pageIndex, pageInMemoryLRU);
-        OPT(pageIndex,pageInMemoryOPT,map);
-
+//        OPT(pageIndex,pageInMemoryOPT,map);
+        TrueOPT(pageIndex,pageInMemoryOPT,array,index);
         timesCount++;
 //        switch (mode) {
 //            case 1:
@@ -206,6 +206,7 @@ public class MemoryPaging {
                 pageInMemory.removeFirstOccurrence(lessOppotunity);
                 pageInMemory.offer(pageIndex);
 
+
             } else {
                 pageInMemory.offer(pageIndex);
             }
@@ -216,6 +217,61 @@ public class MemoryPaging {
         }
         System.out.print("\n");
 
+    }
+
+    static void TrueOPT(int pageIndex, LinkedList<Integer> pageInMemory,int[] instructionsArray,int currentIndex) {
+        if (!pageInMemory.contains(pageIndex)) {
+            missingPageOPT++;
+            if (pageInMemory.size() == memoryBlock) {
+                int swapOut = Integer.MIN_VALUE;
+                for (int page : pageInMemory) {
+                    int tmp = nextIndex(currentIndex, instructionsArray, page);
+                    int cmp;
+                    if (swapOut != Integer.MIN_VALUE) {
+                        cmp = nextIndex(currentIndex, instructionsArray, swapOut);
+                    } else {
+                        cmp = tmp;
+                    }
+                    System.out.println("page: " + page + ", nextIndex: " + tmp + ", swapOut: " + swapOut);
+                    if ( tmp >= cmp) {
+                        swapOut = page;
+                    }
+                }
+
+                System.out.println("OPT swap out " + swapOut);
+                System.out.println("OPT swap in " + pageIndex);
+
+//                pageInMemory.removeFirstOccurrence(swapOut);
+//                pageInMemory.offer(pageIndex);
+
+                int swapOutIndex = pageInMemory.indexOf(swapOut);
+                pageInMemory.add(swapOutIndex, pageIndex);
+                pageInMemory.removeFirstOccurrence(swapOut);
+
+
+            } else {
+                pageInMemory.offer(pageIndex);
+            }
+        }
+        System.out.print("OPT Page in memory: ");
+        for (Integer integer : pageInMemory) {
+            System.out.printf("%d ", integer);
+        }
+        System.out.print("\n");
+    }
+
+    static int nextIndex(int currentIndex, int[] array,int value) {
+
+        int currentPage = value;
+        if (currentIndex + 1 == array.length) {
+            return Integer.MAX_VALUE;
+        }
+        for (int i = currentIndex +1; i < array.length; i++) {
+            if (array[i] / 10 == currentPage) {
+                return i - currentIndex;
+            }
+        }
+        return Integer.MAX_VALUE;
     }
 
     static boolean checkAllDone(boolean[] array) {
