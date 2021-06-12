@@ -27,9 +27,6 @@ public class MemoryPaging {
         int j = 0;
         for (int i = 0; i < 64; i++) {
             int m = (int) (Math.random() * 320);
-//            if (m + 1 <= 319){
-//                instructionExecute(m+1);
-//            }
             instructionsArray[j] = m + 1;
             ++j;
             int m1 = (int) (Math.random() * (m - 1));
@@ -46,39 +43,34 @@ public class MemoryPaging {
 //            instructionExecute(m2);
             instructionsArray[j] = m2;
             ++j;
-//            if (m2 + 1 <= 319) {
-//
-//                instructionExecute(m2+1);
-//
-//            }
             instructionsArray[j] = m2+1;
             ++j;
 
 
         }
-        Map<Integer, Integer> map = new HashMap<>();
+//        Map<Integer, Integer> map = new HashMap<>();
 
         for (int i = 1; i < 321; i++) {
             System.out.printf("%d\t",instructionsArray[i]);
             if (i % 5 == 0) {
-                System.out.printf("\n");
+                System.out.print("\n");
             }
-            if (map.containsKey(instructionsArray[i]/10)) {
-                map.put((instructionsArray[i]/10), map.get(instructionsArray[i]/10) + 1);
-            } else {
-                map.put((instructionsArray[i]/10), 1);
-            }
+//            if (map.containsKey(instructionsArray[i]/10)) {
+//                map.put((instructionsArray[i]/10), map.get(instructionsArray[i]/10) + 1);
+//            } else {
+//                map.put((instructionsArray[i]/10), 1);
+//            }
         }
-        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
-
-            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-
-        }
+//        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+//
+//            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+//
+//        }
 
 
 
         for (int i = 1; i < 321; i++) {
-            instructionExecute(instructionsArray[i],map,instructionsArray,i);
+            instructionExecute(instructionsArray[i], instructionsArray,i);
         }
 
 
@@ -96,27 +88,16 @@ public class MemoryPaging {
 
     }
 
-    static void instructionExecute(int value,Map<Integer,Integer> map,int[] array,int index) {
+    static void instructionExecute(int value, int[] array, int index) {
         int pageIndex = value / 10;
 
 
-        System.out.println("------Currently executing instruction: " + index + " at Page " + pageIndex);
+        System.out.println("------当前执行第" + index + "条指令 " + value + " at Page " + pageIndex);
         FIFO(pageIndex, pageInMemoryFIFO);
         LRU(pageIndex, pageInMemoryLRU);
 //        OPT(pageIndex,pageInMemoryOPT,map);
         TrueOPT(pageIndex,pageInMemoryOPT,array,index);
         timesCount++;
-//        switch (mode) {
-//            case 1:
-//                FIFO(pageIndex, pageInMemory);
-//                break;
-//            case 2:
-//                LRU(pageIndex,pageInMemory);
-//                break;
-//            case 3:
-//                System.out.println();
-//                break;
-//        }
 
     }
 
@@ -129,17 +110,16 @@ public class MemoryPaging {
                 System.out.println("FIFO Swap out " + pageInMemory.pollFirst());
 
                 System.out.println("FIFO Swap in " + pageIndex);
-                pageInMemory.offer(pageIndex);
-//
+                //
 //                pageInMemory.pollFirst();
 
 
 
             } else {
                 System.out.println("FIFO Loaded page: " + pageIndex);
-                pageInMemory.offer(pageIndex);
 
             }
+            pageInMemory.offer(pageIndex);
         }
         System.out.print("FIFO Page in memory: ");
         for (Integer integer : pageInMemory) {
@@ -195,21 +175,19 @@ public class MemoryPaging {
         if (!pageInMemory.contains(pageIndex)) {
             missingPageOPT++;
             if (pageInMemory.size() == memoryBlock) {
-                int lessOppotunity = pageInMemory.peekFirst();
+                int lessOpportunity = pageInMemory.peekFirst();
                 for (int i : pageInMemory) {
-                    if (map.get(i) < map.get(lessOppotunity)) {
-                        lessOppotunity = i;
+                    if (map.get(i) < map.get(lessOpportunity)) {
+                        lessOpportunity = i;
                     }
                 }
                 System.out.println("OPT swap in " + pageIndex);
-                System.out.println("OPT swap out " + lessOppotunity);
-                pageInMemory.removeFirstOccurrence(lessOppotunity);
-                pageInMemory.offer(pageIndex);
+                System.out.println("OPT swap out " + lessOpportunity);
+                pageInMemory.removeFirstOccurrence(lessOpportunity);
 
 
-            } else {
-                pageInMemory.offer(pageIndex);
             }
+            pageInMemory.offer(pageIndex);
         }
         System.out.print("OPT Page in memory: ");
         for (Integer integer : pageInMemory) {
@@ -241,9 +219,6 @@ public class MemoryPaging {
                 System.out.println("OPT swap out " + swapOut);
                 System.out.println("OPT swap in " + pageIndex);
 
-//                pageInMemory.removeFirstOccurrence(swapOut);
-//                pageInMemory.offer(pageIndex);
-
                 int swapOutIndex = pageInMemory.indexOf(swapOut);
                 pageInMemory.add(swapOutIndex, pageIndex);
                 pageInMemory.removeFirstOccurrence(swapOut);
@@ -262,12 +237,11 @@ public class MemoryPaging {
 
     static int nextIndex(int currentIndex, int[] array,int value) {
 
-        int currentPage = value;
         if (currentIndex + 1 == array.length) {
             return Integer.MAX_VALUE;
         }
         for (int i = currentIndex +1; i < array.length; i++) {
-            if (array[i] / 10 == currentPage) {
+            if (array[i] / 10 == value) {
                 return i - currentIndex;
             }
         }

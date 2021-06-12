@@ -152,11 +152,12 @@ public class Partition implements Comparable<Partition> {
             //if ((currentPartition.partitionSize - process.requiredSpace <= bestFitPartition.partitionSize - process.requiredSpace) && !currentPartition.assigned) {
             if (!currentPartition.assigned){
                 if (bestFitPartition == null) {
+//                  //  开始寻找最佳适应分区
                     if (process.requiredSpace <= currentPartition.partitionSize) {
                         bestFitPartition = currentPartition;
                         bestFitIndex = partitionLinkedList.indexOf(currentPartition);
                     }
-                } else if ((currentPartition.partitionSize - process.requiredSpace <= bestFitPartition.partitionSize - process.requiredSpace)) {
+                } else if ((currentPartition.partitionSize - process.requiredSpace >= 0)&&(currentPartition.partitionSize - process.requiredSpace <= bestFitPartition.partitionSize - process.requiredSpace)) {
                     bestFitPartition = currentPartition;
                     bestFitIndex = partitionLinkedList.indexOf(currentPartition);
                 }
