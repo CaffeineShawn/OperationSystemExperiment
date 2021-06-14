@@ -73,7 +73,8 @@ public class Partition implements Comparable<Partition> {
                 System.out.println(partition.toString());
             }
         }
-
+        System.out.print("输入任意值结束:");
+        String end = sc.next();
     }
 
     int partitionSize;

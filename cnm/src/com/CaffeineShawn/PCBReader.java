@@ -1,23 +1,29 @@
 package com.CaffeineShawn;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 
 // 仅作为进程的自动输入
 public class PCBReader {
-	public static void main(String[] args) {
-		String filePath = "src/com/company/TestExample.txt";
-		readTXT(filePath);
+	public static void main(String[] args) throws IOException {
+		Resource resource = new Resource();
+		String filePath = resource.getResource();
+		readTXT();
 	}
 
-	public static PCB[] readTXT(String filePath) {
+	public static PCB[] readTXT() {
 		PCB[] pcbArray = null;
 
 		try {
-			File file = new File(filePath);
-			if (file.isFile() && file.exists()) {
-				InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
+
+
+				Resource resource = new Resource();
+				InputStreamReader inputStreamReader = new InputStreamReader(Objects.requireNonNull(resource.getClass().getResourceAsStream("testExample.txt")), StandardCharsets.UTF_8);
 				BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
 				int sizeOfPcbArray = Integer.parseInt(bufferedReader.readLine());
@@ -38,9 +44,9 @@ public class PCBReader {
 					System.out.println(pcbArray[i].name + " " + pcbArray[i].burstTime + " " + pcbArray[i].arriveTime +"\n");
 				}
 				bufferedReader.close();
-			} else {
-				System.out.println("File not exists.");
-			}
+				inputStreamReader.close();
+
+
 		} catch (IOException e) {
 			System.out.println("File read error.");
 		}

@@ -75,7 +75,8 @@ public class MemoryPaging {
         System.out.printf("OPT缺页率: %f", ((float) missingPageOPT / (float) timesCount) * 100);
         System.out.println("%");
         System.out.println("OPT缺页次数: "+missingPageOPT );
-
+        System.out.print("输入任意值结束:");
+        String end = new Scanner(System.in).next();
     }
     // 完成从地址到页面的变换，使用三种页面调度算法
     static void instructionExecute(int value, int[] array, int index) {
@@ -160,6 +161,7 @@ public class MemoryPaging {
             System.out.printf("%d ", integer);
         }
         System.out.print("\n");
+
     }
 //    基于使用统计次数的OPT，已废弃
 //    static void OPT(int pageIndex, LinkedList<Integer> pageInMemory,Map<Integer,Integer> map) {

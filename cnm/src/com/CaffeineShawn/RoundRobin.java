@@ -21,9 +21,12 @@ public class RoundRobin {
         String modeSelection = sc.nextLine();
 
         if (modeSelection.equals("Manual")) {
-            File savedTestcase = new File("src/com/company/savedTestcase.txt");
 
-            FileOutputStream outputStream = new FileOutputStream(savedTestcase, true);
+
+
+//            File savedTestcase = new File("src/com/company/savedTestcase.txt");
+//
+//            FileOutputStream outputStream = new FileOutputStream(savedTestcase, true);
 
             System.out.print("输入进程数:");
             int sizeofPCB = sc.nextInt();
@@ -33,8 +36,8 @@ public class RoundRobin {
             System.out.print("输入时间片长:");
             timeSlice = sc.nextInt();
 
-            String basicData = sizeofPCB + "\n" + timeSlice + "\n";
-            outputStream.write(basicData.getBytes(StandardCharsets.UTF_8));
+//            String basicData = sizeofPCB + "\n" + timeSlice + "\n";
+//            outputStream.write(basicData.getBytes(StandardCharsets.UTF_8));
 
 
             pcbArray = new PCB[sizeofPCB];
@@ -42,14 +45,14 @@ public class RoundRobin {
                 System.out.print("输入当前进程名、需求执行时间、到达时间:");
                 pcbArray[i] = new PCB(sc.next(), sc.nextInt(), sc.nextInt());
                 String pcbData = pcbArray[i].name + " " + pcbArray[i].burstTime + " " + pcbArray[i].requiredTime + "\n";
-                outputStream.write(pcbData.getBytes(StandardCharsets.UTF_8));
+//                outputStream.write(pcbData.getBytes(StandardCharsets.UTF_8));
             }
-            String enter = "\n";
-            outputStream.write(enter.getBytes(StandardCharsets.UTF_8));
-            outputStream.close();
+//            String enter = "\n";
+//            outputStream.write(enter.getBytes(StandardCharsets.UTF_8));
+//            outputStream.close();
 
         } else {
-            pcbArray = PCBReader.readTXT("src/com/company/TestExample.txt");
+            pcbArray = PCBReader.readTXT();
         }
 
         // 将进程以先来后到的方式进行排序
@@ -59,6 +62,8 @@ public class RoundRobin {
         PCB.processEntry(pcbArray,timeSlice);
 
 
+        System.out.print("输入任意值结束:");
+        String end = sc.next();
     }
 
 
