@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/cnm.iml" filepath="$PROJECT_DIR$/cnm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/OperationSystemExp.iml" filepath="$PROJECT_DIR$/OperationSystemExp.iml" />
     </modules>
   </component>
 </project>

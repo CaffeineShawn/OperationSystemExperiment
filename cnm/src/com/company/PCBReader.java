@@ -3,6 +3,8 @@ package com.company;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
+
+// 仅作为进程的自动输入
 public class PCBReader {
 	public static void main(String[] args) {
 		String filePath = "src/com/company/TestExample.txt";
