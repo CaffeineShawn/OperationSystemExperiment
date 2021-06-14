@@ -1,3 +1,6 @@
 # OperationSystemExperiment
  
-* Round-Robin Scheduling
+- Round-Robin Scheduling  
+- Partition Replacement  
+- Page Scheduling
+
